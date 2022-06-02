@@ -2,9 +2,11 @@
 
 /*-- scss:rules --*/
 
+@import url('https://fonts.googleapis.com/css2?family=Comforter&family=Dancing+Script&family=Lobster&display=swap');
+
 // General
 body {
-  font-size: 17px;
+  font-size: 20px;
   color: black;
   background-image:
     linear-gradient(128deg, rgba(10, 10, 10,0.06) 0%, rgba(10, 10, 10,0.06) 50%, rgba(193, 193, 193,0.06) 50%, rgba(193, 193, 193,0.06) 100%),
@@ -15,6 +17,7 @@ body {
 
 div.quarto-title-meta { font-size: 1.3rem; }
 
+p { color: black !important;}
 
 h1, h2, h3, .author, .date {
   margin-bottom: 15px;
@@ -32,6 +35,12 @@ h3 {
   font-size: 27px !important;
   font-family: 'Snell Roundhand';
 }
+h2.anchored { 
+  font-size: 2rem !important;
+  font-family: 'Dancing Script', cursive; 
+  background-color: mediumpurple;
+}
+
 table[class="guitar"] td {
   padding: 5px !important;
 }
@@ -43,22 +52,24 @@ table[class="guitar"] td {
 [id*="minor"] > h3     {color: black; background: rgb(100, 100, 255);}
 
 /* Table of contents */
-.tocify .tocify-item {
+#TOC a {
+  &:hover { color: white !important; }
+  &:active { color: black; }
+}
+
+#TOC > ul > li {
   color: white;
-  background: black;
+  background-color: black;
   border-top: 2px solid white;
 }
-.tocify > .tocify-header > .tocify-subheader > li {
-  color: black !important;
+[data-scroll-target*="major"] {
+  background-color: rgb(250, 100, 100) !important;
 }
-[data-unique*="Major"] {
-  background: rgb(250, 100, 100) !important;
+[data-scroll-target*="suspended"] {
+  background-color: rgb(115, 255, 115)  !important;
 }
-[data-unique*="Suspended"] {
-  background: rgb(115, 255, 115)  !important;
-}
-[data-unique*="Minor"] {
-  background: rgb(100, 100, 255) !important;
+[data-scroll-target*="minor"] {
+  background-color: rgb(100, 100, 255) !important;
 }
 
 /* Guitar table styling */
@@ -125,8 +136,12 @@ table[class*="columns-10"] > td {
 
 /* Chord button styling */
 input[value*="."] {
+  border-radius: 20px;
+  transform: rotate(5deg);
   color: white !important;
   background-color: black !important;
+  box-shadow: 5px 5px 20px 5px;
+  background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.2)); 
 }
 .universal-button {
   color: black;
@@ -135,5 +150,17 @@ input[value*="."] {
   margin-right: auto;
   border-radius: 10px;
   font-size: 20px !important;
-  background: rgb(255, 245, 0);
+  box-shadow: 0px 5px 10px 5px;
+  background-color: rgb(250, 240, 45);
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.2)); 
+}
+.universal-button:hover {
+  transform: translate(0, -7px);
+}
+
+#toc-title { 
+  background: transparent;
+  font-size: 2rem !important;
+  text-shadow: 2px 2px hotpink;
+  font-family: 'Dancing Script', cursive; 
 }
