@@ -1,0 +1,139 @@
+/*-- scss:defaults --*/
+
+/*-- scss:rules --*/
+
+// General
+body {
+  font-size: 17px;
+  color: black;
+  background-image:
+    linear-gradient(128deg, rgba(10, 10, 10,0.06) 0%, rgba(10, 10, 10,0.06) 50%, rgba(193, 193, 193,0.06) 50%, rgba(193, 193, 193,0.06) 100%),
+    linear-gradient(51deg, rgba(231, 231, 231,0.06) 0%, rgba(231, 231, 231,0.06) 50%, rgba(39, 39, 39,0.06) 50%, rgba(39, 39, 39,0.06) 100%),
+    linear-gradient(90deg, rgba(121,167,236, 0.39), rgba(121,167,236, 0.39));
+  background-size: 56px 56px;
+}
+
+div.quarto-title-meta { font-size: 1.3rem; }
+
+
+h1, h2, h3, .author, .date {
+  margin-bottom: 15px;
+}
+h2 {
+  color: black;
+  background: white;
+  text-align: center;
+  font-family: Copperplate;
+  font-size: 26px !important;
+}
+h3 {
+  text-align: center;
+  width: 50%;
+  font-size: 27px !important;
+  font-family: 'Snell Roundhand';
+}
+table[class="guitar"] td {
+  padding: 5px !important;
+}
+.major     {color: rgb(250, 100, 100);}
+.suspended {color: rgb(115, 255, 115);}
+.minor     {color: rgb(100, 100, 255);}
+[id*="major"] > h3     {color: black; background: rgb(250, 100, 100);}
+[id*="suspended"] > h3 {color: black; background: rgb(115, 255, 115);}
+[id*="minor"] > h3     {color: black; background: rgb(100, 100, 255);}
+
+/* Table of contents */
+.tocify .tocify-item {
+  color: white;
+  background: black;
+  border-top: 2px solid white;
+}
+.tocify > .tocify-header > .tocify-subheader > li {
+  color: black !important;
+}
+[data-unique*="Major"] {
+  background: rgb(250, 100, 100) !important;
+}
+[data-unique*="Suspended"] {
+  background: rgb(115, 255, 115)  !important;
+}
+[data-unique*="Minor"] {
+  background: rgb(100, 100, 255) !important;
+}
+
+/* Guitar table styling */
+table[class*="guitar"] td {
+  padding: 4px;
+}
+table[class*="guitar"] {
+  background: black;
+  width: 25%;
+  text-align: center;
+  border: 2px solid gray;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: -10px;
+  padding: 2.5px;
+}
+table[class*="guitar"] > caption {
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+  caption-side: bottom;
+  font-size: 20px !important;
+}
+table[class*="guitar"] td {
+  font-size: 12.5px !important;
+  color: white;
+  border: 2px solid gray;
+  position: relative;
+  display: table-cell;
+}
+table[class*="guitar"] td p {
+  margin: 0px !important;
+}
+table[class*="columns-1"] > td {
+  width: 100%;
+}
+table[class*="columns-2"] > td {
+  width: 50%;
+}
+table[class*="columns-3"] > td {
+  width: 33.33%;
+}
+table[class*="columns-4"] > td {
+  width: 25%;
+}
+table[class*="columns-5"] > td {
+  width: 20%;
+}
+table[class*="columns-6"] > td {
+  width: 16.67%;
+}
+table[class*="columns-7"] > td {
+  width: 14.29%;
+}
+table[class*="columns-8"] > td {
+  width: 12.5%;
+}
+table[class*="columns-9"] > td {
+  width: 11.11%;
+}
+table[class*="columns-10"] > td {
+  width: 10%;
+}
+
+/* Chord button styling */
+input[value*="."] {
+  color: white !important;
+  background-color: black !important;
+}
+.universal-button {
+  color: black;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 10px;
+  font-size: 20px !important;
+  background: rgb(255, 245, 0);
+}

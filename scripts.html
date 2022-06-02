@@ -1,0 +1,64 @@
+<script>
+  let audio;
+  let acorde;
+  let identifier;
+  let musical_notes;
+  let number_strings;
+  const available_notes = [
+    "a","b","c","d","e","f","g","h",
+    "i","j","k","l","m","n","o","p",
+    "q","r","s","t","u","v","w","x","y"
+  ];
+
+  document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+      // Get buttons of each chord
+      const chordButtons = 
+        [...document.querySelectorAll("input.esconde-item")];
+
+      // Make each button selected toggle its chord's visibility
+      chordButtons.forEach(element => {
+        element.addEventListener(
+          "click", 
+          function () {
+            let str = this.value;
+            let removeLastChar = str.slice(0, str.length - 1);
+            str = parseInt(removeLastChar) + 2;
+            let target = document.getElementsByTagName("table")[str];
+            if (target.style.display == 'none') {
+              target.style.display = 'table';
+            } else {
+              target.style.display = 'none';
+            }
+        })
+      });
+
+      // Get each guitar chord diagram
+      const diagrams = [...document.querySelectorAll("table.guitar")];
+
+      // For each chord diagram displayed, play its audio when clicked
+      diagrams.forEach(element => {
+        element.addEventListener(
+          "click",
+          function () {
+            musical_notes = document.getElementsByClassName("notes");
+            identifier = this.id;
+            number_strings = identifier.length;
+            
+            acorde = [];
+            for (let i = 0; i < number_strings; i++) {
+              acorde.push(available_notes.indexOf(identifier.charAt(i)));
+            }
+            
+            for (let i = 0; i < number_strings; i++) {
+              audio = musical_notes[acorde[i]];
+              audio.currentTime = 0;
+              audio.play(); 
+            }
+          }
+        )
+      })
+    }
+  )
+</script>

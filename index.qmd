@@ -1,0 +1,1169 @@
+---
+title: "M3 guitar tuning"
+subtitle: "An introduction and many chord examples"
+author: "Lucio Cornejo"
+date: "`r Sys.time()`"
+execute:
+  echo: false
+  cache: true
+format:
+  html:
+    theme: custom.scss
+    toc: TRUE
+    toc-depth: 3 
+    toc-location: left
+    smooth-scroll: true
+    include-after-body: scripts.html
+---
+
+\
+
+```{r}
+contador <- 0
+contador_string <- ""
+```
+
+<audio class="notes" preload="auto">
+  <source src="audio/D3.mp3"></source> <!--a-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Eb3.mp3"></source> <!--b-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/E3.mp3"></source> <!--c-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/F3.mp3"></source> <!--d-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Gb3.mp3"></source> <!--e-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/G3.mp3"></source> <!--f-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Ab3.mp3"></source> <!--g-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/A3.mp3"></source> <!--h-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Bb3.mp3"></source> <!--i-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/B3.mp3"></source> <!--j-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/C4.mp3"></source> <!--k-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Db4.mp3"></source> <!--l-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/D4.mp3"></source> <!--m-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Eb4.mp3"></source> <!--n-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/E4.mp3"></source> <!--o-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/F4.mp3"></source> <!--p-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Gb4.mp3"></source> <!--q-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/G4.mp3"></source> <!--r-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Ab4.mp3"></source> <!--s-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/A4.mp3"></source> <!--t-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Bb4.mp3"></source> <!--u-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/B4.mp3"></source> <!--v-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/C5.mp3"></source> <!--w-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/Db5.mp3"></source> <!--x-->
+</audio>
+<audio class="notes" preload="auto">
+  <source src="audio/D5.mp3"></source> <!--y-->
+</audio>
+
+
+```{r}
+#| label: "automatic-code-for-guitar-table"
+
+library(stringr)
+neck <- function(matriz,bajo,chord_name,chord_voicing) {
+  m <- nrow(matriz)
+  n <- ncol(matriz)
+
+  notes <- c(
+    "D3","Eb3","E3","F3",
+    "Gb3","G3","Ab3","A3",
+    "Bb3","B3","C4","Db4",
+    "D4","Eb4","E4","F4",
+    "Gb4","G4","Ab4","A4",
+    "Bb4","B4","C5","Db4","D5"
+  )
+
+  tags <- c(
+    "a","b","c","d",
+    "e","f","g","h",
+    "i","j","k","l",
+    "m","n","o","p",
+    "q","r","s","t",
+    "u","v","w","x","y"
+  )
+
+  # Obtain note positions
+  posiciones <- list()
+  counter <- 0
+  for (i in 1:m) {
+    for (j in 1:n) {
+      if(nchar(matriz[i,j])<2){
+        counter <- counter + 1
+        posiciones[[counter]] <- c(i,j)
+      }
+    }
+  }
+  fret <- matrix(0,m,n)
+  for (i in m:1) {
+    t <- 1 + 4*(m-i)
+    fret[i,] <- t:(t+n-1)
+  }
+  filas <- NULL
+  columnas <- NULL
+  for (i in 1:length(posiciones)) {
+    filas[i] <- posiciones[[i]][1]
+    columnas[i] <- posiciones[[i]][2]
+  }
+  call <- cbind(filas,columnas)
+  indices <- rev(fret[call])
+
+  # Adjusting the notes to be played
+  k <- length(indices)
+  indices <- indices - rep(indices[1]-1,k)
+  if (bajo == -1) {
+    indices <- indices + rep(4*(6-m),k)  
+  } else {
+    indices <- indices + rep(bajo,k)
+  }
+  
+  # Unique identifier
+  id <- ""
+  for (i in indices) {
+    id <- paste(id,tags[i],sep="")
+  }
+
+  # Item button
+  contador <<- contador + 1
+  contador_string <<- paste0(as.character(contador),".") 
+  item <- paste0(
+    "<div style=\"white-space: nowrap;\">\n  <p>\n",
+    "    <input class=\"esconde-item\" value=\"",
+    contador_string, "\"type=\"button\"></input>\n"
+  )
+  voicing <- paste(chord_voicing, collapse = "&emsp;")
+  item <- paste0(
+    item, "    &ensp;**",
+    chord_name, "&ensp;:&ensp;** ",
+    voicing, "\n  </p>\n"
+  )
+
+  # HTML Table
+  tabla <- paste0(
+    item, "  <table id='", id, 
+    "' class='guitar columns-", as.character(n), "'>\n"
+  )
+  for (i in 1:m) {
+    tabla <- paste0(tabla, "    <tr>\n")
+    for (j in 1:n) {
+      tabla <- paste0(tabla, "      <td>", matriz[i,j], "</td>\n")
+    }
+    tabla <- paste0(tabla, "    </tr>\n")
+  }
+
+  # Chord notes
+  tabla <- paste(tabla, "    <caption>", "Notes of the chord: ")
+  chord_notes <- paste(notes[indices], collapse="&nbsp; ")
+  tabla <- paste0(tabla, chord_notes)
+  tabla <- paste0(tabla, "</caption>\n")
+  tabla <- paste0(tabla, "  </table>\n</div>\n\n")
+
+  # Insert HTML code for the guitar_diagram
+  cat(tabla)
+}
+```
+
+
+## About
+
+This website serves as a tool for people interested in another approach to guitar tuning. \
+<p> 
+  The tuning we'll be working with in this site is called 
+  <span style="text-decoration: underline; font-weight: bold;">M3 tuning</span> 
+  because each string of the guitar is
+  <span style="text-decoration: underline; font-weight: bold;">one major third</span> 
+  apart from any consecutive string next to it.
+</p>
+
+Partly for that reason, the guitar diagrams displayed in this site are not completely similar to 
+the ones guitarrists are used to. Let me show you an example of what we'll be working with: 
+
+<p style="margin-bottom: 6x;"> &nbsp; </p>
+
+<table class="guitar">
+  <tr>
+    <td>Ab4</td>
+    <td>A4</td>
+    <td>Bb4</td>
+    <td>B4</td>
+  </tr>
+  <tr>
+    <td>E4</td>
+    <td>F4</td>
+    <td>Gb4</td>
+    <td>G4</td>
+  </tr>
+  <tr>
+    <td>C4</td>
+    <td>Db4</td>
+    <td>D4</td>
+    <td>Eb4</td>
+  </tr>
+  <tr>
+    <td>Ab3</td>
+    <td>A3</td>
+    <td>Bb3</td>
+    <td>B3</td>
+  </tr>
+  <tr>
+    <td>E3</td>
+    <td>F3</td>
+    <td>Gb3</td>
+    <td>G3</td>
+  </tr>
+  <tr>
+    <td>C3</td>
+    <td>Db3</td>
+    <td>D3</td>
+    <td>Eb3</td>
+  </tr>
+</table>
+
+<p style="margin-bottom: 0.5px;"> &nbsp; </p>
+
+<p> 
+  As you can see, the horizontal lines in the diagram
+  <span style="text-decoration: underline; font-weight: bold;">do not</span> 
+  represent guitar strings. 
+  Such lines are simply imaginary separators of the notes in the guitar.
+  However, such diagram still represents a section of the guitar, where each
+  cell/mini-rectangle denotes a note, the bottom rows of the diagram stand for
+  the lower notes (frequency wise) and the top rows of the diagram stand for 
+  the upper notes.
+</p>
+
+<p> 
+  Note a particular
+  <span style="text-decoration: underline; font-weight: bold;">symmetry</span> 
+  of such M3 guitar diagram: Every note is repeated
+  (with respect to octave equivalence) in the same column 
+  <span style="text-decoration: underline;">three</span> 
+  rows above and below in the diagram. 
+</p>
+
+<p> 
+  Such symmetry allows any guitar of six strings tuned with the M3 tuning
+  to be divided 
+  <span style="text-decoration: underline; font-weight: bold;">equally</span> 
+  (with respect to octave equivalence) into two sections:
+  The group of the first three strings and the group of the last three strings. \
+  So, it becomes much easier to learn the note positions along the guitar neck,
+  the musical scales, chords and so on.
+</p>
+
+<p style="margin-bottom: 20px;"> &nbsp; </p>
+
+## How to use this site
+
+Every chord shown in this site can be heard by simply clicking on its respective diagram.
+
+It won't be necessary to show in the diagrams the guitar strings represented by the diagram/table rows, because,
+thanks to the M3 tuning symmetry discussed in the "About" section, if you transpose along the guitar neck a "hand position" shown in some 
+diagram (changing fret and/or string positions), _the chord type remains the same_.
+
+Which means that, for example, the "major 7 chord" hand position is the same everywhere in the guitar, if such guitar is tuned
+with the M3 tuning^[For guitars, such property is unique to tuning systems where the musical distance between any two consecutive strings is always the same. For the M3 tuning, such musical distance is a major third.]. 
+
+In order to see a couple chord diagram examples, press the following black buttons "-1." and "0.":
+
+```{r}
+#| results: asis
+
+contador <- -2
+chord <- matrix("&nbsp; &nbsp;",6,3)
+chord[6,3]   <- 0  #"&nbsp; &nbsp;"
+chord[4,3]  <- 4 #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,2] <- 2 #"&nbsp; &nbsp;"
+chord[1,2] <- 3 #"&nbsp; &nbsp;"
+neck(chord,0,"maj9",c("3","1","9","5","7"))
+```
+\
+```{r}
+#| results: asis
+
+contador <- -1
+chord <- matrix("&nbsp; &nbsp;",6,4)
+chord[6,2]   <- 2  #"&nbsp; &nbsp;"
+chord[4,4]  <- 3 #"&nbsp; &nbsp;"
+chord[3,4] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1 #"&nbsp; &nbsp;"
+chord[1,1] <- 1 #"&nbsp; &nbsp;"
+neck(chord,2,"min9",c("1","b7","9","b3","5"))
+```
+\
+
+Contrary to the chord diagram example in the "About" section, from now on the chord diagrams in this site can only contain
+the numbers 0, 1, 2, 3 and 4 (no notes whatsoever), associated in that specific order to the fingers thumb, index, middle, ring and pinky. 
+Besides this, each diagram will have a caption displaying the notes that sound when you click on such diagram.
+
+Also, the chords will be presented as:
+
+<p>"Button displaying the current number in the chords list" &ensp; "Chord name" <strong style="font-weight: bold;">:</strong> &ensp; "Chord voicing"</p>
+
+The chord voicing will be based on the degrees of the notes, presented (frequency wise) from lowest to highest.
+
+<p style="margin-bottom: 7px;"> &nbsp; </p>
+
+Lastly, by default all the chords in this website are hidden when the site loads, but you may display them all, or hide all of them, 
+by pressing the appropiate button out of the following two:
+<!--#endregion-->
+
+<!--#region Show or hide all chord diagrams -->
+<input class="universal-button" type="button" value="Hide all chord diagrams" onclick="esconder()"></input>
+<p style="margin-bottom: 10px;"> &nbsp; </p>
+<input class="universal-button" type="button" value="Show all chord diagrams" onclick="mostrar()"></input>
+
+<script>
+  let tablas = document.getElementsByClassName('guitar');
+  function esconder () { 
+    for (let i = 1; i < tablas.length; i++) { tablas[i].style.display = 'none'; }
+  }
+  function mostrar (){ 
+    for (let i = 1; i < tablas.length; i++) { tablas[i].style.display = 'table'; }
+  }
+</script>
+
+<p style="margin-bottom: 10px;"> &nbsp; </p>
+
+```{r}
+contador <<- 0
+contador_string <<- ""
+```
+
+## 3-string chords
+
+### Major {.major}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,2)
+chord[3,2] <- 1 #"&nbsp; &nbsp;"
+chord[2,2] <- 3 #"&nbsp; &nbsp;"
+chord[1,1] <- 2 #"&nbsp; &nbsp;"
+neck(chord,10,"maj",c("1","3","5"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,2)
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,2] <- 3  #"&nbsp; &nbsp;"
+neck(chord,6,"maj",c("5","1","3"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,2)
+chord[3,2] <- 2 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,2] <- 3  #"&nbsp; &nbsp;"
+neck(chord,4,"maj",c("3","5","1"))
+```
+\
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,4)
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,1] <- 1 #"&nbsp; &nbsp;"
+chord[1,4] <- 4 #"&nbsp; &nbsp;"
+neck(chord,4,"maj7 (no 5)",c("1","3","7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,4)
+chord[3,4] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,7,"maj7 (no 5)",c("7","1","3"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,4)
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,4] <- 4  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,5,"maj7 (no 5)",c("3","7","1"))
+```
+\
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,5)
+chord[3,5] <- 4 #"&nbsp; &nbsp;"
+chord[2,3] <- 2  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,11,"maj add9 (no 5)",c("1","9","3"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,5)
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,5] <- 4  #"&nbsp; &nbsp;"
+chord[1,3] <- 2  #"&nbsp; &nbsp;"
+neck(chord,4,"maj add9 (no 5)",c("3","1","9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,3)
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,3] <- 3  #"&nbsp; &nbsp;"
+neck(chord,4,"7 (no 5)",c("1","3","b7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,3)
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,3] <- 3  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,5,"7 (no 5)",c("3","b7","1"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,3)
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,10,"7 (no 5)",c("b7","1","3"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,3)
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,3] <- 4  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,6,"maj add(#11) (no 5)",c("1","3","#11"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,3)
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,3] <- 4  #"&nbsp; &nbsp;"
+neck(chord,11,"maj add(#11) (no 5)",c("3","#11","1"))
+```
+\
+
+### Suspended {.suspended}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,3)
+chord[3,2] <- 2 #"&nbsp; &nbsp;"
+chord[2,3] <- 3  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,8,"sus4",c("1","4","5"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,3)
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,2] <- 2  #"&nbsp; &nbsp;"
+neck(chord,10,"sus2",c("1","2","5"))
+```
+\
+
+### Minor {.minor}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",3,2)
+chord[3,2] <- 2 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,8,"min",c("1","b3","5"))
+```
+\
+
+
+## 4-string chords
+
+### Major {.major}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,2)
+chord[4,2] <- 3  #"&nbsp; &nbsp;"
+chord[3,2] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 2  #"&nbsp; &nbsp;"
+neck(chord,5,"maj7",c("1","3","5","7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,4] <- 3  #"&nbsp; &nbsp;"
+chord[3,4] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,4,"maj7",c("5","7","1","3"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,5)
+chord[4,4] <- 3  #"&nbsp; &nbsp;"
+chord[3,5] <- 4 #"&nbsp; &nbsp;"
+chord[2,3] <- 2  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,6,"maj add9",c("5","1","9","3"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,2] <- 2 #"&nbsp; &nbsp;"
+chord[2,3] <- 4  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,7,"maj add9",c("3","5","1","9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,2] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,8,"maj add9",c("1","3","5","9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,3] <- 4  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,3,"maj add(#11)",c("5","1","3","#11"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,3] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,2] <- 2  #"&nbsp; &nbsp;"
+neck(chord,10,"maj7 add(#11)",c("1","3","#11","7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,3] <- 2  #"&nbsp; &nbsp;"
+chord[3,4] <- 3 #"&nbsp; &nbsp;"
+chord[2,4] <- 4  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,4,"maj add(11)",c("5","1","3","4"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,2)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,2] <- 3 #"&nbsp; &nbsp;"
+chord[2,2] <- 4  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,7,"maj7 #5",c("1","3","#5","7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,4] <- 3  #"&nbsp; &nbsp;"
+chord[3,4] <- 4 #"&nbsp; &nbsp;"
+chord[2,3] <- 2  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,10,"major add(13)",c("1","3","5","6"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,1] <- 1  #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,3] <- 3  #"&nbsp; &nbsp;"
+neck(chord,7,"maj 6/9",c("1","3","6","9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,5)
+chord[4,1] <- 1  #"&nbsp; &nbsp;"
+chord[3,4] <- 3 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,5] <- 4  #"&nbsp; &nbsp;"
+neck(chord,7,"maj add(13)",c("1","5","6","3"))
+```
+\
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,3] <- 4 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,8,"7",c("1","3","5","b7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,1] <- 1  #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,3] <- 3  #"&nbsp; &nbsp;"
+chord[1,2] <- 2  #"&nbsp; &nbsp;"
+neck(chord,6,"7 add(b9)",c("1","3","b7","b9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,1] <- 1  #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,3] <- 3  #"&nbsp; &nbsp;"
+chord[1,3] <- 4  #"&nbsp; &nbsp;"
+neck(chord,10,"9",c("1","3","b7","9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,1] <- 1  #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,3] <- 3  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,5,"7 add(#9)",c("1","3","b7","#9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,3] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,7,"7 (b5)",c("1","3","b5","b7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,4] <- 3  #"&nbsp; &nbsp;"
+chord[3,4] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,2] <- 2  #"&nbsp; &nbsp;"
+neck(chord,7,"7 add(11)",c("1","3","4","b7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,2] <- 2 #"&nbsp; &nbsp;"
+chord[2,4] <- 4  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,6,"rootless 7 add(11)",c("5","b7","3","11"))
+```
+\
+
+### Suspended {.suspended}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,3] <- 4  #"&nbsp; &nbsp;"
+neck(chord,6,"sus2",c("1","2","5","1"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,3] <- 4  #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,2] <- 3  #"&nbsp; &nbsp;"
+neck(chord,5,"maj7 sus2",c("1","2","5","7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,3] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,2] <- 3  #"&nbsp; &nbsp;"
+neck(chord,6,"sus4",c("1","4","5","1"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,7,"maj7 sus4",c("1","4","5","7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,4] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,6,"sus2 add(#11)",c("1","#11","5","9"))
+```
+\
+
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,4] <- 4  #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,4,"7 sus4",c("1","4","5","b7"))
+```
+\
+
+### Minor {.minor}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,3] <- 4  #"&nbsp; &nbsp;"
+chord[3,2] <- 2 #"&nbsp; &nbsp;"
+chord[2,2] <- 3  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,7,"min7",c("1","b3","5","b7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,2)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,1] <- 1  #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,5,"min add(M7)",c("1","b3","5","7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,1] <- 1  #"&nbsp; &nbsp;"
+chord[2,4] <- 4  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,5,"min9",c("1","b3","b7","9"))
+```
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,2] <- 3 #"&nbsp; &nbsp;"
+chord[2,3] <- 4  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,3,"min add(9)",c("b3","5","1","9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,1] <- 1  #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,7,"min add(9)",c("1","b3","5","9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,4] <- 4  #"&nbsp; &nbsp;"
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,2] <- 2  #"&nbsp; &nbsp;"
+neck(chord,7,"min7 add(11)",c("1","b3","11","b7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,1] <- 1  #"&nbsp; &nbsp;"
+chord[3,4] <- 4 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,3] <- 3  #"&nbsp; &nbsp;"
+neck(chord,5,"min7 add(11)",c("b3","b7","1","11"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,4] <- 4  #"&nbsp; &nbsp;"
+chord[3,3] <- 2 #"&nbsp; &nbsp;"
+chord[2,3] <- 3  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,7,"min add(13)",c("1","b3","5","6"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,3] <- 3  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,5,"min 6/9",c("1","b3","6","9"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,1] <- 1  #"&nbsp; &nbsp;"
+chord[3,4] <- 3 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,4,"min add(13)",c("1","5","6","b3"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,2] <- 2 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,9,"min7b5",c("1","b3","b5","b7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,3)
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,3] <- 4  #"&nbsp; &nbsp;"
+chord[1,2] <- 3  #"&nbsp; &nbsp;"
+neck(chord,10,"min (b5) = dim",c("1","b3","b5","1"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,4] <- 4  #"&nbsp; &nbsp;"
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,11,"dim7",c("1","b3","b5","bb7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",4,4)
+chord[4,1] <- 1  #"&nbsp; &nbsp;"
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,2] <- 2  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,9,"dim7",c("1","b5","bb7","b3"))
+```
+\
+
+
+## 5-string chords
+
+### Major {.major}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",5,3)
+chord[5,3] <- 3  #"&nbsp; &nbsp;"
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,3] <- 4 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,6,"maj (9,#11)",c("3","5","1","9","#11"))
+```
+\
+
+
+### Suspended {.suspended}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",5,4)
+chord[5,1] <- 1  #"&nbsp; &nbsp;"
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,3] <- 3 #"&nbsp; &nbsp;"
+chord[2,4] <- 4  #"&nbsp; &nbsp;"
+chord[1,4] <- 4  #"&nbsp; &nbsp;"
+neck(chord,5,"min add(11)",c("1","11","b7","b3","5"))
+```
+\
+
+
+### Minor {.minor}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",5,3)
+chord[5,3] <- 4  #"&nbsp; &nbsp;"
+chord[4,2] <- 2  #"&nbsp; &nbsp;"
+chord[3,2] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1  #"&nbsp; &nbsp;"
+chord[1,1] <- 1  #"&nbsp; &nbsp;"
+neck(chord,4,"min9",c("1","b3","5","b7","9"))
+```
+\
+
+
+## 6-string chords
+
+### Major {.major}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",6,3)
+chord[6,3] <- 0 #"&nbsp; &nbsp;"
+chord[5,2] <- "&nbsp; &nbsp;"
+chord[4,3] <- 4 #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,2] <- 2 #"&nbsp; &nbsp;"
+chord[1,2] <- 3 #"&nbsp; &nbsp;"
+neck(chord,3,"maj9",c("3","1","9","5","7"))
+``` 
+\ 
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",6,3)
+chord[6,2] <- 2 #"&nbsp; &nbsp;"
+chord[5,2] <- "&nbsp; &nbsp;"
+chord[4,1] <- 1 #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,2] <- 3 #"&nbsp; &nbsp;"
+chord[1,3] <- 4 #"&nbsp; &nbsp;"
+neck(chord,3,"maj7 add(13)",c("1","5","7","3","13"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",6,4)
+chord[6,1] <- 1 #"&nbsp; &nbsp;"
+chord[5,4] <- 3 #"&nbsp; &nbsp;"
+chord[4,3] <- "&nbsp; &nbsp;"
+chord[3,3] <- 2 #"&nbsp; &nbsp;"
+chord[2,1] <- 1 #"&nbsp; &nbsp;"
+chord[1,4] <- 4 #"&nbsp; &nbsp;"
+neck(chord,1,"maj9",c("1","5","9","3","7"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",5,3)
+chord[5,3] <- 3 #"&nbsp; &nbsp;"
+chord[4,1] <- 1 #"&nbsp; &nbsp;"
+chord[3,1] <- 1 #"&nbsp; &nbsp;"
+chord[2,1] <- 1 #"&nbsp; &nbsp;"
+chord[1,1] <- 1 #"&nbsp; &nbsp;"
+neck(chord,8,"7 (no 5) add(b13)",c("b7","1","3","b13","1"))
+```
+\
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",6,3)  
+chord[6,3] <- 3 #"&nbsp; &nbsp;"  
+chord[5,3] <- 4 #"&nbsp; &nbsp;"  
+chord[4,2] <- 2 #"&nbsp; &nbsp;"  
+chord[3,1] <- 1 #"&nbsp; &nbsp;"  
+chord[2,1] <- 1 #"&nbsp; &nbsp;"  
+chord[1,1] <- 1 #"&nbsp; &nbsp;"  
+neck(chord,4,"9 add(#11)",c("1","3","5","b7","9","#11")) 
+```
+\
+
+### Suspended {.suspended}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",6,3)
+chord[6,1] <- 0  #"&nbsp; &nbsp;"
+chord[4,3] <- 3  #"&nbsp; &nbsp;"
+chord[3,3] <- 4 #"&nbsp; &nbsp;"
+chord[2,2] <- 1  #"&nbsp; &nbsp;"
+chord[1,2] <- 2  #"&nbsp; &nbsp;"
+neck(chord,0,"13 sus4",c("1","b7","9","11","13"))
+```
+\
+
+
+### Minor {.minor}
+
+```{r}
+#| results: "asis"
+
+chord <- matrix("&nbsp; &nbsp;",6,4)
+chord[6,2] <- 2 #"&nbsp; &nbsp;"
+chord[5,2] <- "&nbsp; &nbsp;"
+chord[4,1] <- 1 #"&nbsp; &nbsp;"
+chord[3,4] <- 3 #"&nbsp; &nbsp;"
+chord[2,1] <- 1 #"&nbsp; &nbsp;"
+chord[1,4] <- 4 #"&nbsp; &nbsp;"
+neck(chord,2,"min9",c("1","5","9","b3","b7"))
+```
+\
+
+
+## 7-string chords
+
+### Major {.major}
+
+
+### Suspended {.suspended}
+
+
+### Minor {.minor}
+
+<p style="margin-bottom: 50px;"> &nbsp; </p>
+
+<!--#region  Play every chord in this website: one second wait between chords -->
+  <!-- Pending to create an input button which allows the user to set a time between chords and then play them all automatically.   -->
+  <!-- <script>
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+    await delay(1000); /// waiting 1 second.
+
+    let acordes = document.getElementsByClassName('guitar');
+    for(var i=1;i<acordes.length;i++){
+    acordes[i].click();
+    await delay(1000);
+    }
+  </script> -->
