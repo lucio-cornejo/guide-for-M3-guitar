@@ -16,6 +16,8 @@
       // Get buttons of each chord
       const chordButtons = 
         [...document.querySelectorAll("input.esconde-item")];
+      // Select all audio elements defined
+      musical_notes = document.getElementsByClassName("notes");
 
       // Make each button selected toggle its chord's visibility
       chordButtons.forEach(element => {
@@ -42,7 +44,6 @@
         element.addEventListener(
           "click",
           function () {
-            musical_notes = document.getElementsByClassName("notes");
             identifier = this.id;
             number_strings = identifier.length;
             
